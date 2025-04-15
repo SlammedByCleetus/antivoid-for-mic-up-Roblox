@@ -1,4 +1,19 @@
--- Put this in StarterPlayer > StarterPlayerScripts or under a ScreenGui
+-- Compatibility Check (Wave & Awp)
+local executor = identifyexecutor and identifyexecutor() or "Unknown"
+if not (executor:lower():find("wave") or executor:lower():find("awp")) then
+    warn("This script only supports Wave or Awp executors.")
+    return
+end
+
+-- Safe loadstring handler
+local function safeLoad(url)
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet(url))()
+    end)
+    if not success then
+        warn("Failed to load script from:", url)
+    end
+end
 
 -- Create the UI
 local player = game.Players.LocalPlayer
@@ -46,8 +61,6 @@ titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextSize = 16
 titleLabel.BackgroundTransparency = 1
 titleLabel.Parent = titleBar
-
--- Apply Neon Glow to Title
 applyNeonGlow(titleLabel)
 
 -- Minimize Button
@@ -62,7 +75,7 @@ minimizeButton.BackgroundColor3 = Color3.fromRGB(15, 30, 60)
 minimizeButton.BorderSizePixel = 0
 minimizeButton.Parent = titleBar
 
--- Body
+-- Body Frame
 local bodyFrame = Instance.new("Frame")
 bodyFrame.Name = "BodyContent"
 bodyFrame.Size = UDim2.new(1, 0, 1, -30)
@@ -88,10 +101,7 @@ local function createTabButton(text, position)
 	btn.BackgroundColor3 = Color3.fromRGB(30, 60, 120)
 	btn.BorderSizePixel = 0
 	btn.Parent = tabFrame
-
-	-- Apply Neon Glow to Tab Buttons
 	applyNeonGlow(btn)
-
 	return btn
 end
 
@@ -122,8 +132,8 @@ local scrollFrameForMicUp = createScrollFrame(bodyFrame)
 local scrollFrameUniversal = createScrollFrame(bodyFrame)
 local scrollFrameOtherTab = createScrollFrame(bodyFrame)
 
--- Create Buttons
-local function createButton(text, parent, callback)
+-- Button Creator
+local function createButton(text, parent, url)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(0.8, 0, 0, 40)
 	btn.Text = text
@@ -133,69 +143,37 @@ local function createButton(text, parent, callback)
 	btn.BackgroundColor3 = Color3.fromRGB(30, 60, 120)
 	btn.BorderSizePixel = 0
 	btn.Parent = parent
-	btn.MouseButton1Click:Connect(callback)
-
-	-- Apply Neon Glow to Buttons
+	btn.MouseButton1Click:Connect(function()
+		safeLoad(url)
+	end)
 	applyNeonGlow(btn)
 end
 
--- Code Snippets
-local micUpCode = [[repeat task.wait() until game.Players.LocalPlayer
-loadstring(game:HttpGet("https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua"))()]]
-
-local antiVoidCode = [[loadstring(game:HttpGet(('https://raw.githubusercontent.com/SlammedByCleetus/antivoid-for-mic-up-Roblox/refs/heads/main/AntiVoid.lua')))()]]
-
-local unsuspendVoiceChatCode = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/SlammedByCleetus/antivoid-for-mic-up-Roblox/refs/heads/main/unsuspend%20voicechat'))()]]
-
-local infiniteYieldCode = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()]]
-
-local systemBrokenCode = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/script"))()]]
-
--- Create Buttons
-createButton("Execute For Mic Up", scrollFrameForMicUp, function()
-	loadstring(micUpCode)()
-end)
-
-createButton("Execute AntiVoid", scrollFrameForMicUp, function()
-	loadstring(antiVoidCode)()
-end)
-
-createButton("Unsuspend Voice Chat", scrollFrameUniversal, function()
-	loadstring(unsuspendVoiceChatCode)()
-end)
-
-createButton("Infinite Yield", scrollFrameOtherTab, function()
-	loadstring(infiniteYieldCode)()
-end)
-
-createButton("System Broken", scrollFrameOtherTab, function()
-	loadstring(systemBrokenCode)()
-end)
+-- Script Buttons
+createButton("Execute For Mic Up", scrollFrameForMicUp, "https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua")
+createButton("Execute AntiVoid", scrollFrameForMicUp, "https://raw.githubusercontent.com/SlammedByCleetus/antivoid-for-mic-up-Roblox/refs/heads/main/AntiVoid.lua")
+createButton("Unsuspend Voice Chat", scrollFrameUniversal, "https://raw.githubusercontent.com/SlammedByCleetus/antivoid-for-mic-up-Roblox/refs/heads/main/unsuspend%20voicechat")
+createButton("Infinite Yield", scrollFrameOtherTab, "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
+createButton("System Broken", scrollFrameOtherTab, "https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/script")
 
 -- Tab Switch Logic
 local function switchTab(tab)
 	scrollFrameForMicUp.Visible = false
 	scrollFrameUniversal.Visible = false
 	scrollFrameOtherTab.Visible = false
-
-	if tab == 1 then
-		scrollFrameForMicUp.Visible = true
-	elseif tab == 2 then
-		scrollFrameUniversal.Visible = true
-	elseif tab == 3 then
-		scrollFrameOtherTab.Visible = true
+	if tab == 1 then scrollFrameForMicUp.Visible = true
+	elseif tab == 2 then scrollFrameUniversal.Visible = true
+	elseif tab == 3 then scrollFrameOtherTab.Visible = true
 	end
 end
 
 tabButton1.MouseButton1Click:Connect(function() switchTab(1) end)
 tabButton2.MouseButton1Click:Connect(function() switchTab(2) end)
 tabButton3.MouseButton1Click:Connect(function() switchTab(3) end)
-
 switchTab(1)
 
 -- Minimize Logic
 local isMinimized = false
-
 minimizeButton.MouseButton1Click:Connect(function()
 	isMinimized = not isMinimized
 	for _, child in ipairs(frame:GetChildren()) do

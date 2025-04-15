@@ -149,8 +149,8 @@ universalBtn1.BorderColor3 = Color3.fromRGB(255, 0, 0)
 universalBtn1.Parent = universalFrame
 
 universalBtn1.MouseButton1Click:Connect(function()
-local script1 = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()]]
-loadstring(script1)()
+    local script1 = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()]]
+    loadstring(script1)()
 end)
 
 local universalBtn2 = universalBtn1:Clone()
@@ -159,8 +159,18 @@ universalBtn2.Text = "SystemBroken"
 universalBtn2.Parent = universalFrame
 
 universalBtn2.MouseButton1Click:Connect(function()
-local script2 = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/script"))()]]
-loadstring(script2)()
+    local script2 = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/script"))()]]
+    loadstring(script2)()
+end)
+
+local universalBtn3 = universalBtn1:Clone()
+universalBtn3.Position = UDim2.new(0, 10, 0, 90)
+universalBtn3.Text = "No Mic Ban"
+universalBtn3.Parent = universalFrame
+
+universalBtn3.MouseButton1Click:Connect(function()
+    local script3 = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/SlammedByCleetus/antivoid-for-mic-up-Roblox/refs/heads/main/no%20mic%20ban.lua'))()]]
+    loadstring(script3)()
 end)
 
 -- Settings: Minimize Keybind Input

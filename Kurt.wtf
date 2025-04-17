@@ -3,6 +3,7 @@ local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
+local VoiceChatService = game:GetService("VoiceChatService")
 
 -- ScreenGui Setup
 local screenGui = Instance.new("ScreenGui")
@@ -21,21 +22,21 @@ background.Parent = screenGui
 
 -- Golden borders
 local function createEdge(position, size)
-    local edge = Instance.new("Frame")
-    edge.BackgroundColor3 = Color3.fromRGB(255, 215, 0) -- Gold
-    edge.BorderSizePixel = 0
-    edge.Position = position
-    edge.Size = size
-    edge.ZIndex = 2
-    edge.Parent = screenGui
+	local edge = Instance.new("Frame")
+	edge.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
+	edge.BorderSizePixel = 0
+	edge.Position = position
+	edge.Size = size
+	edge.ZIndex = 2
+	edge.Parent = screenGui
 end
 
-createEdge(UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, 4)) -- Top
-createEdge(UDim2.new(0, 0, 1, -4), UDim2.new(1, 0, 0, 4)) -- Bottom
-createEdge(UDim2.new(0, 0, 0, 0), UDim2.new(0, 4, 1, 0)) -- Left
-createEdge(UDim2.new(1, -4, 0, 0), UDim2.new(0, 4, 1, 0)) -- Right
+createEdge(UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, 4))
+createEdge(UDim2.new(0, 0, 1, -4), UDim2.new(1, 0, 0, 4))
+createEdge(UDim2.new(0, 0, 0, 0), UDim2.new(0, 4, 1, 0))
+createEdge(UDim2.new(1, -4, 0, 0), UDim2.new(0, 4, 1, 0))
 
--- Title Text: "Kurt.wtf"
+-- Title
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(0, 300, 0, 50)
 title.Position = UDim2.new(0.5, -150, 0.4, -60)
@@ -45,10 +46,25 @@ title.TextSize = 40
 title.TextColor3 = Color3.fromRGB(0, 170, 255)
 title.BackgroundTransparency = 1
 title.ZIndex = 5
-title.TextTransparency = 1
 title.Parent = screenGui
 
--- Subtitle: "Welcome..."
+-- Breathing effect
+local function breatheTitleColor()
+	while true do
+		TweenService:Create(title, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+			TextColor3 = Color3.fromRGB(0, 255, 0)
+		}):Play()
+		wait(2)
+		TweenService:Create(title, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+			TextColor3 = Color3.fromRGB(0, 0, 0)
+		}):Play()
+		wait(2)
+	end
+end
+
+task.spawn(breatheTitleColor)
+
+-- Subtitle
 local subtitle = Instance.new("TextLabel")
 subtitle.Size = UDim2.new(0, 300, 0, 30)
 subtitle.Position = UDim2.new(0.5, -150, 0.4, 0)
@@ -61,11 +77,9 @@ subtitle.ZIndex = 5
 subtitle.TextTransparency = 1
 subtitle.Parent = screenGui
 
--- Animate title and subtitle fade-in
 TweenService:Create(title, TweenInfo.new(2), { TextTransparency = 0 }):Play()
 TweenService:Create(subtitle, TweenInfo.new(2), { TextTransparency = 0 }):Play()
 
--- Loading bar container
 local loadingBarBG = Instance.new("Frame")
 loadingBarBG.Size = UDim2.new(0.6, 0, 0, 25)
 loadingBarBG.Position = UDim2.new(0.2, 0, 0.92, 0)
@@ -74,7 +88,6 @@ loadingBarBG.BorderSizePixel = 0
 loadingBarBG.ZIndex = 5
 loadingBarBG.Parent = screenGui
 
--- Loading bar fill
 local loadingBar = Instance.new("Frame")
 loadingBar.Size = UDim2.new(0, 0, 1, 0)
 loadingBar.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
@@ -82,41 +95,31 @@ loadingBar.BorderSizePixel = 0
 loadingBar.ZIndex = 6
 loadingBar.Parent = loadingBarBG
 
--- Animate loading bar fill over 5 seconds
 TweenService:Create(loadingBar, TweenInfo.new(5, Enum.EasingStyle.Linear), {
-    Size = UDim2.new(1, 0, 1, 0)
+	Size = UDim2.new(1, 0, 1, 0)
 }):Play()
 
--- Fade out all elements just before finish (at 4.5s)
+-- Fade out loading UI
 task.delay(4.5, function()
-    -- Fade out text
-    TweenService:Create(title, TweenInfo.new(0.5), { TextTransparency = 1 }):Play()
-    TweenService:Create(subtitle, TweenInfo.new(0.5), { TextTransparency = 1 }):Play()
-
-    -- Fade out loading bar
-    TweenService:Create(loadingBarBG, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
-    TweenService:Create(loadingBar, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
-
-    -- Fade out background
-    TweenService:Create(background, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
-
-    -- Fade out golden borders
-    for _, child in pairs(screenGui:GetChildren()) do
-        if child:IsA("Frame") and child ~= background and child ~= loadingBarBG and child ~= loadingBar then
-            TweenService:Create(child, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
-        end
-    end
+	TweenService:Create(title, TweenInfo.new(0.5), { TextTransparency = 1 }):Play()
+	TweenService:Create(subtitle, TweenInfo.new(0.5), { TextTransparency = 1 }):Play()
+	TweenService:Create(loadingBarBG, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
+	TweenService:Create(loadingBar, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
+	TweenService:Create(background, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
+	for _, child in pairs(screenGui:GetChildren()) do
+		if child:IsA("Frame") and child ~= background and child ~= loadingBarBG and child ~= loadingBar then
+			TweenService:Create(child, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
+		end
+	end
 end)
 
--- MAIN UI AFTER LOADING ANIMATION (Fade-In)
+-- MAIN UI AFTER LOADING
 task.delay(5, function()
-    -- Main UI Setup
     local mainScreen = Instance.new("ScreenGui")
     mainScreen.Name = "MainUI"
     mainScreen.Parent = player:WaitForChild("PlayerGui")
     mainScreen.ResetOnSpawn = false
 
-    -- Main Frame (for UI)
     local main = Instance.new("Frame")
     main.Size = UDim2.new(0, 500, 0, 400)
     main.Position = UDim2.new(0.5, -250, 0.5, -200)
@@ -128,24 +131,11 @@ task.delay(5, function()
     main.Active = true
     main.Draggable = true
 
-    -- Fade-in effect for Main UI
     TweenService:Create(main, TweenInfo.new(1, Enum.EasingStyle.Sine), {
         BackgroundTransparency = 0
     }):Play()
 
-    -- Title Bar
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 30)
-    title.Text = "Kurt.Wtf"
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 16
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-    title.BorderColor3 = Color3.fromRGB(255, 0, 0)
-    title.BorderSizePixel = 1
-    title.Parent = main
-
-    -- Tab Buttons
+    -- Function to create a tab button
     local function createTabButton(text, position)
         local btn = Instance.new("TextButton")
         btn.Text = text
@@ -160,11 +150,6 @@ task.delay(5, function()
         return btn
     end
 
-    local tab1 = createTabButton("Mic up", UDim2.new(0, 10, 0, 35))
-    local settingsTab = createTabButton("Settings", UDim2.new(0, 120, 0, 35))
-    local universalTab = createTabButton("Universal", UDim2.new(0, 230, 0, 35))
-
-    -- Tab Content Frames
     local function createTabFrame()
         local frame = Instance.new("Frame")
         frame.Size = UDim2.new(1, -20, 1, -70)
@@ -176,99 +161,103 @@ task.delay(5, function()
         return frame
     end
 
+    local tab1 = createTabButton("Mic up", UDim2.new(0, 10, 0, 35))
+    local settingsTab = createTabButton("Settings", UDim2.new(0, 120, 0, 35))
+    local universalTab = createTabButton("Universal", UDim2.new(0, 230, 0, 35))
+
     local tab1Frame = createTabFrame()
     local settingsFrame = createTabFrame()
     local universalFrame = createTabFrame()
 
-    -- Anti-Ban Toggle
-    local toggle = Instance.new("TextButton")
-    toggle.Size = UDim2.new(0, 200, 0, 30)
-    toggle.Position = UDim2.new(0, 10, 0, 10)
-    toggle.Text = "Anti-Ban: OFF"
-    toggle.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
-    toggle.TextColor3 = Color3.fromRGB(255, 80, 80)
-    toggle.Font = Enum.Font.GothamBold
-    toggle.TextSize = 14
-    toggle.BorderColor3 = Color3.fromRGB(255, 0, 0)
-    toggle.Parent = tab1Frame
+    -- ✅ NEW No Mic Ban Toggle (auto recovers VC)
+    local noMicBanToggle = Instance.new("TextButton")
+    noMicBanToggle.Size = UDim2.new(0, 200, 0, 30)
+    noMicBanToggle.Position = UDim2.new(0, 10, 0, 10)
+    noMicBanToggle.Text = "No Mic Ban: OFF"
+    noMicBanToggle.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
+    noMicBanToggle.TextColor3 = Color3.fromRGB(255, 80, 80)
+    noMicBanToggle.Font = Enum.Font.GothamBold
+    noMicBanToggle.TextSize = 14
+    noMicBanToggle.BorderColor3 = Color3.fromRGB(255, 0, 0)
+    noMicBanToggle.Parent = tab1Frame
 
-    local antiBanEnabled = false
-    toggle.MouseButton1Click:Connect(function()
-        antiBanEnabled = not antiBanEnabled
-        toggle.Text = "Anti-Ban: " .. (antiBanEnabled and "ON" or "OFF")
-        toggle.BackgroundColor3 = antiBanEnabled and Color3.fromRGB(0, 100, 0) or Color3.fromRGB(40, 0, 0)
-        if antiBanEnabled then
-            print("Anti-ban activated")
+    local noMicBanEnabled = false
+    local micWasEnabled = true
+
+    task.spawn(function()
+        while true do
+            task.wait(1)
+            if noMicBanEnabled then
+                local success, isEnabled = pcall(function()
+                    return VoiceChatService:IsVoiceEnabledForUserIdAsync(player.UserId)
+                end)
+                if success then
+                    if micWasEnabled and not isEnabled then
+                        pcall(function()
+                            VoiceChatService:RequestToggleMic()
+                            print("Mic was disabled. Attempting to re-enable.")
+                        end)
+                    end
+                    micWasEnabled = isEnabled
+                end
+            end
         end
     end)
 
-    -- Execute MicUp Button
-    local executeBtn = toggle:Clone()
-    executeBtn.Position = UDim2.new(0, 10, 0, 50)
-    executeBtn.Text = "Execute MicUp"
-    executeBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    executeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    executeBtn.Parent = tab1Frame
-
-    executeBtn.MouseButton1Click:Connect(function()
-        local micUpCode = [[repeat task.wait() until game.Players.LocalPlayer
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua"))()]]
-        loadstring(micUpCode)()
+    noMicBanToggle.MouseButton1Click:Connect(function()
+        noMicBanEnabled = not noMicBanEnabled
+        noMicBanToggle.Text = "No Mic Ban: " .. (noMicBanEnabled and "ON" or "OFF")
+        noMicBanToggle.BackgroundColor3 = noMicBanEnabled and Color3.fromRGB(0, 100, 0) or Color3.fromRGB(40, 0, 0)
     end)
 
-    -- Execute AntiVoid Button
-    local voidBtn = toggle:Clone()
-    voidBtn.Position = UDim2.new(0, 10, 0, 90)
-    voidBtn.Text = "Execute AntiVoid"
-    voidBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    voidBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    voidBtn.Parent = tab1Frame
+    -- Other buttons remain unchanged
+    local function createExecuteButton(text, position, code)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0, 200, 0, 30)
+        btn.Position = position
+        btn.Text = text
+        btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.Font = Enum.Font.GothamBold
+        btn.TextSize = 14
+        btn.BorderColor3 = Color3.fromRGB(255, 0, 0)
+        btn.Parent = tab1Frame
+        btn.MouseButton1Click:Connect(function()
+            loadstring(game:HttpGet(code))()
+        end)
+        return btn
+    end
 
-    voidBtn.MouseButton1Click:Connect(function()
-        local voidCode = [[loadstring(game:HttpGet(('https://raw.githubusercontent.com/SlammedByCleetus/antivoid-for-mic-up-Roblox/refs/heads/main/AntiVoid.lua')))()]]
-        loadstring(voidCode)()
-    end)
+    createExecuteButton("Execute MicUp", UDim2.new(0, 10, 0, 50),
+        "https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua")
+    createExecuteButton("Execute AntiVoid", UDim2.new(0, 10, 0, 90),
+        "https://raw.githubusercontent.com/SlammedByCleetus/antivoid-for-mic-up-Roblox/refs/heads/main/AntiVoid.lua")
 
-    -- Universal Button 1
-    local universalBtn1 = Instance.new("TextButton")
-    universalBtn1.Size = UDim2.new(0, 200, 0, 30)
-    universalBtn1.Position = UDim2.new(0, 10, 0, 10)
-    universalBtn1.Text = "Infinite Yield"
-    universalBtn1.Font = Enum.Font.GothamBold
-    universalBtn1.TextSize = 14
-    universalBtn1.TextColor3 = Color3.fromRGB(255, 255, 255)
-    universalBtn1.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    universalBtn1.BorderColor3 = Color3.fromRGB(255, 0, 0)
-    universalBtn1.Parent = universalFrame
+    -- Universal tab buttons
+    local function createUniversalBtn(name, position, url)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0, 200, 0, 30)
+        btn.Position = position
+        btn.Text = name
+        btn.Font = Enum.Font.GothamBold
+        btn.TextSize = 14
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        btn.BorderColor3 = Color3.fromRGB(255, 0, 0)
+        btn.Parent = universalFrame
+        btn.MouseButton1Click:Connect(function()
+            loadstring(game:HttpGet(url))()
+        end)
+    end
 
-    universalBtn1.MouseButton1Click:Connect(function()
-        local script1 = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()]]
-        loadstring(script1)()
-    end)
+    createUniversalBtn("Infinite Yield", UDim2.new(0, 10, 0, 10),
+        "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
+    createUniversalBtn("SystemBroken", UDim2.new(0, 10, 0, 50),
+        "https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/script")
+    createUniversalBtn("No Mic Ban", UDim2.new(0, 10, 0, 90),
+        "https://raw.githubusercontent.com/SlammedByCleetus/antivoid-for-mic-up-Roblox/refs/heads/main/no%20mic%20ban.lua")
 
-    -- Universal Button 2
-    local universalBtn2 = universalBtn1:Clone()
-    universalBtn2.Position = UDim2.new(0, 10, 0, 50)
-    universalBtn2.Text = "SystemBroken"
-    universalBtn2.Parent = universalFrame
-
-    universalBtn2.MouseButton1Click:Connect(function()
-        local script2 = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/script"))()]]
-        loadstring(script2)()
-    end)
-
-    -- Universal Button 3
-    local universalBtn3 = universalBtn1:Clone()
-    universalBtn3.Position = UDim2.new(0, 10, 0, 90)
-    universalBtn3.Text = "No Mic Ban"
-    universalBtn3.Parent = universalFrame
-
-    universalBtn3.MouseButton1Click:Connect(function()
-        local script3 = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/SlammedByCleetus/antivoid-for-mic-up-Roblox/refs/heads/main/no%20mic%20ban.lua'))()]]
-        loadstring(script3)()
-    end)
-
-    -- Settings: Minimize Keybind Input
+    -- Settings
     local keyLabel = Instance.new("TextLabel")
     keyLabel.Size = UDim2.new(0, 120, 0, 25)
     keyLabel.Position = UDim2.new(0, 10, 0, 10)
@@ -314,7 +303,7 @@ task.delay(5, function()
         end
     end)
 
-    -- Tab Switching Logic
+    -- Tab switching
     tab1.MouseButton1Click:Connect(function()
         tab1Frame.Visible = true
         settingsFrame.Visible = false

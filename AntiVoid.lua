@@ -155,17 +155,22 @@ end)
 -- --- 4. MAIN PLATFORM LOGIC & TOGGLE UI ---
 task.wait(5.2)
 
-local character = player.Character or player.CharacterAdded:Wait()
-local hrp = character:WaitForChild("HumanoidRootPart")
-
-local FIXED_Y = -1
 local PLATFORM_SIZE = 2000
+local spawn_Y = -1 
 local extendedFloor = nil
 local beams = {}
 local mainLoop = nil
 
 -- Function to handle Rainbow Platform generation
 local function createPlatform()
+    local character = player.Character
+    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+    
+    if hrp then
+        -- OFFSET ADJUSTED: -3.45 puts you flush with the visual floor
+        spawn_Y = hrp.Position.Y - 3.45
+    end
+
     extendedFloor = Instance.new("Part", workspace)
     extendedFloor.Name = "FollowingBaseplate_Managed"
     extendedFloor.Size = Vector3.new(PLATFORM_SIZE, 1, PLATFORM_SIZE)
@@ -194,7 +199,7 @@ local function createPlatform()
     mainLoop = RunService.RenderStepped:Connect(function()
         local currentHrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
         if currentHrp and extendedFloor then 
-            extendedFloor.Position = Vector3.new(currentHrp.Position.X, FIXED_Y, currentHrp.Position.Z) 
+            extendedFloor.Position = Vector3.new(currentHrp.Position.X, spawn_Y, currentHrp.Position.Z) 
         end
         local color = Color3.fromHSV((tick() * 0.05) % 1, 0.8, 1)
         for _, beam in pairs(beams) do beam.Color = ColorSequence.new(color) end
@@ -208,9 +213,9 @@ local sg = Instance.new("ScreenGui", PlayerGui)
 sg.Name = "BaseplateControl"
 sg.ResetOnSpawn = false
 
-local function styleButton(b, text)
+local function styleButton(b, text, offset)
     b.Size = UDim2.new(0, 150, 0, 40)
-    b.Position = UDim2.new(1, -160, 0, 10)
+    b.Position = UDim2.new(1, -160, 0, offset)
     b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     b.TextColor3 = Color3.new(1, 1, 1)
     b.Text = text
@@ -220,11 +225,14 @@ local function styleButton(b, text)
 end
 
 local destroyBtn = Instance.new("TextButton", sg)
-styleButton(destroyBtn, "Destroy Platform")
+styleButton(destroyBtn, "Destroy Platform", 10)
+destroyBtn.Visible = false
 
 local addBtn = Instance.new("TextButton", sg)
-styleButton(addBtn, "Add Baseplate")
-addBtn.Visible = false
+styleButton(addBtn, "Add Baseplate", 10)
+
+local scriptDestroyBtn = Instance.new("TextButton", sg)
+styleButton(scriptDestroyBtn, "Destroy Script", 60)
 
 -- Button Logic
 destroyBtn.MouseButton1Click:Connect(function()
@@ -241,6 +249,30 @@ addBtn.MouseButton1Click:Connect(function()
     destroyBtn.Visible = true
 end)
 
+-- Script Destroyer Logic
+local confirmDestroy = false
+scriptDestroyBtn.MouseButton1Click:Connect(function()
+    if not confirmDestroy then
+        confirmDestroy = true
+        scriptDestroyBtn.Text = "Are you sure?"
+        scriptDestroyBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+        
+        task.delay(5, function()
+            if confirmDestroy then
+                confirmDestroy = false
+                scriptDestroyBtn.Text = "Destroy Script"
+                scriptDestroyBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            end
+        end)
+    else
+        -- Complete cleanup
+        if mainLoop then mainLoop:Disconnect() end
+        if extendedFloor then extendedFloor:Destroy() end
+        sg:Destroy()
+        _G.KurtLoaded = false
+        StarterGui:SetCore("SendNotification", {Title = "KURT.WTF", Text = "Script Terminated.", Duration = 3})
+    end
+end)
+
 -- Startup
-createPlatform()
 StarterGui:SetCore("SendNotification", {Title = "KURT.WTF LOADED", Text = "System Initialized.", Duration = 5})
